@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAdapter = new MainAdapter(getApplicationContext());
 
-        mModel.loadPimpinan();
+        //mModel.loadPimpinan();
         mModel.getPimpinan().observe(this, new Observer<List<Pimpinan>>() {
             @Override
             public void onChanged(List<Pimpinan> pimpinans) {
@@ -163,7 +163,10 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.dismiss();
 
                 if (shouldUpdate && data != null) {
-                    Log.d(TAG, "onClick: update pimpinan");
+                    data.setNmPimpinan(edNmPimpinan.getText().toString());
+                    data.setJabatan(edJabatan.getText().toString());
+
+                    mModel.updatePimpinan(data, position);
                 } else {
                     Pimpinan dataInsert = new Pimpinan();
                     dataInsert.setNmPimpinan(edNmPimpinan.getText().toString());
@@ -185,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 if (which == 0) {
                     showInputDialog(true, mListPimpinan.get(position), position);
                 } else {
-                    Log.d(TAG, "onClick: hapus data " + position);
+                    mModel.deletePimpinan(mListPimpinan.get(position), position);
                 }
             }
         });

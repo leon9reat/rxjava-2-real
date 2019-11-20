@@ -17,7 +17,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface ApiService {
-    String BASE_URL = "http://192.168.100.35:3000/api/";
+    String BASE_URL = "http://192.168.3.180:3000/api/";
 
     @GET("mas_list_pimpinan")
     Single<List<Pimpinan>> getAllPimpinan();

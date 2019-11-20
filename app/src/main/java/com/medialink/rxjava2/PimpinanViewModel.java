@@ -19,6 +19,7 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.DisposableCompletableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -27,9 +28,13 @@ public class PimpinanViewModel extends ViewModel {
     private CompositeDisposable disposable = new CompositeDisposable();
     private ApiService apiService;
 
-    private MutableLiveData<List<Pimpinan>> mutaPimpinan = new MutableLiveData<>();
+    private MutableLiveData<List<Pimpinan>> mutaPimpinan;
 
     public LiveData<List<Pimpinan>> getPimpinan() {
+        if (mutaPimpinan == null) {
+            mutaPimpinan = new MutableLiveData<>();
+            loadPimpinan();
+        }
         return mutaPimpinan;
     }
 
@@ -75,7 +80,7 @@ public class PimpinanViewModel extends ViewModel {
                             public void onSuccess(CrudRespon crudRespon) {
                                 Log.d(TAG, "onSuccess: insert data");
 
-                                ArrayList<Pimpinan> list = new ArrayList<>();
+                                ArrayList<Pimpinan> list;
                                 list = (ArrayList<Pimpinan>) mutaPimpinan.getValue();
                                 list.add(data);
 
@@ -84,7 +89,57 @@ public class PimpinanViewModel extends ViewModel {
 
                             @Override
                             public void onError(Throwable e) {
-                                Log.d(TAG, "onError: "+e.getMessage());
+                                Log.d(TAG, "onError: " + e.getMessage());
+                            }
+                        })
+        );
+    }
+
+    public void updatePimpinan(Pimpinan data, final int position) {
+        disposable.add(
+                apiService.updatePimpinan(data.getIdPimpinan(), data.toHashMap())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new DisposableCompletableObserver() {
+                            @Override
+                            public void onComplete() {
+                                Log.d(TAG, "update pimpinan " + data.getIdPimpinan());
+
+                                ArrayList<Pimpinan> list;
+                                list = (ArrayList<Pimpinan>) mutaPimpinan.getValue();
+                                list.get(position).setNmPimpinan(data.getNmPimpinan());
+                                list.get(position).setJabatan(data.getJabatan());
+
+                                mutaPimpinan.postValue(list);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.d(TAG, "onError: " + e.getMessage());
+                            }
+                        })
+        );
+    }
+
+    public void deletePimpinan(Pimpinan pimpinan, final int position) {
+        disposable.add(
+                apiService.deletePimpinan(pimpinan.getIdPimpinan())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new DisposableCompletableObserver() {
+                            @Override
+                            public void onComplete() {
+                                Log.d(TAG, "hapus data " + pimpinan.getIdPimpinan());
+
+                                ArrayList<Pimpinan> temp;
+                                temp = (ArrayList<Pimpinan>) mutaPimpinan.getValue();
+                                temp.remove(position);
+                                mutaPimpinan.postValue(temp);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.d(TAG, "onError: " + e.getMessage());
                             }
                         })
         );
