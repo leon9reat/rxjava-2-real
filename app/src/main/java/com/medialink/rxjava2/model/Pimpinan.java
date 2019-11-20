@@ -2,6 +2,8 @@ package com.medialink.rxjava2.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
+
 public class Pimpinan extends BaseRespon {
 
 	@SerializedName("id_pimpinan")
@@ -35,5 +37,12 @@ public class Pimpinan extends BaseRespon {
 
 	public String getJabatan(){
 		return jabatan;
+	}
+
+	public HashMap<String, String> toHashMap() {
+		HashMap<String, String> temp = new HashMap<>();
+		if (nmPimpinan != null) temp.put("nm_pimpinan", nmPimpinan);
+		if (jabatan != null) temp.put("jabatan", jabatan);
+		return temp;
 	}
 }

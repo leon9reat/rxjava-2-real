@@ -165,7 +165,11 @@ public class MainActivity extends AppCompatActivity {
                 if (shouldUpdate && data != null) {
                     Log.d(TAG, "onClick: update pimpinan");
                 } else {
-                    Log.d(TAG, "onClick: tambah pimpinan");
+                    Pimpinan dataInsert = new Pimpinan();
+                    dataInsert.setNmPimpinan(edNmPimpinan.getText().toString());
+                    dataInsert.setJabatan(edJabatan.getText().toString());
+
+                    mModel.createPimpinan(dataInsert);
                 }
             }
         });

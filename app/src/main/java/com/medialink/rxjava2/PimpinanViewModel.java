@@ -6,10 +6,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.medialink.rxjava2.model.CrudRespon;
 import com.medialink.rxjava2.model.Pimpinan;
 import com.medialink.rxjava2.network.ApiClient;
 import com.medialink.rxjava2.network.ApiService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -58,6 +60,31 @@ public class PimpinanViewModel extends ViewModel {
                             @Override
                             public void onError(Throwable e) {
                                 Log.d(TAG, "onError: " + e.getMessage());
+                            }
+                        })
+        );
+    }
+
+    public void createPimpinan(Pimpinan data) {
+        disposable.add(
+                apiService.createPimpinan(data.toHashMap())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new DisposableSingleObserver<CrudRespon>() {
+                            @Override
+                            public void onSuccess(CrudRespon crudRespon) {
+                                Log.d(TAG, "onSuccess: insert data");
+
+                                ArrayList<Pimpinan> list = new ArrayList<>();
+                                list = (ArrayList<Pimpinan>) mutaPimpinan.getValue();
+                                list.add(data);
+
+                                mutaPimpinan.postValue(list);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.d(TAG, "onError: "+e.getMessage());
                             }
                         })
         );
